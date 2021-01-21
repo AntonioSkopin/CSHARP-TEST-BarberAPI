@@ -1,7 +1,4 @@
-﻿using BarberAPI.Auth.Entities;
-using BarberAPI.Auth.Models;
-using BarberAPI.Auth.Services;
-using BarberAPI.Helpers;
+﻿using BarberAPI.Helpers;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,8 +9,11 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using BarberAPI.Services;
+using BarberAPI.Models;
+using BarberAPI.Entities;
 
-namespace BarberAPI.Auth.Controllers
+namespace BarberAPI.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
@@ -35,6 +35,15 @@ namespace BarberAPI.Auth.Controllers
             _appSettings = appSettings.Value;
         }
 
+        [Authorize]
+        [HttpGet]
+        public async Task<ActionResult<Client>> GetByGd(Guid gd)
+        {
+            var user = await _authService.GetByGd(gd);
+            var model = _mapper.Map<ClientModel>(user);
+            return Ok(model);
+        }
+
         [AllowAnonymous]
         [HttpPost]
         public IActionResult Authenticate([FromBody] AuthenticateModel model)
@@ -52,7 +61,8 @@ namespace BarberAPI.Auth.Controllers
                 {
                     Subject = new ClaimsIdentity(new Claim[]
                     {
-                        new Claim(ClaimTypes.Name, user.Gd.ToString())
+                        // User.Values holds GD of user
+                        new Claim(ClaimTypes.Name, user.Values.ToString())
                     }),
                     Expires = DateTime.UtcNow.AddDays(7),
                     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
@@ -63,7 +73,8 @@ namespace BarberAPI.Auth.Controllers
                 // Return basic user info and authentication token
                 return Ok(new
                 {
-                    Gd = user.Gd,
+                    TypeUser = user.Keys,
+                    Gd = user.Values,
                     Token = tokenString
                 });
             }
@@ -94,9 +105,29 @@ namespace BarberAPI.Auth.Controllers
             }
         }
 
+        [AllowAnonymous]
+        [HttpPost]
+        public async Task<ActionResult<Barber>> RegisterBarber([FromBody] RegisterBarberModel model)
+        {
+            // Map model to entity
+            var user = _mapper.Map<Barber>(model);
+
+            try
+            {
+                // Create user
+                await _authService.RegisterBarber(user, model.Password);
+                return Ok();
+            }
+            catch (AppException ex)
+            {
+                // Return error message if there was an exception
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
         [Authorize]
         [HttpPut]
-        public async Task<IActionResult> UpdateClient(Guid gd, [FromBody] UpdateClientModel model)
+        public async Task<IActionResult> UpdateClient(Guid gd, [FromBody] UpdateModel model)
         {
             // Map model to entity and set id
             var user = _mapper.Map<Client>(model);
@@ -117,19 +148,10 @@ namespace BarberAPI.Auth.Controllers
 
         [Authorize]
         [HttpDelete]
-        public async Task<IActionResult> DeleteClient(int id)
+        public async Task<IActionResult> DeleteClientAccount(Guid client_gd)
         {
-            await _authService.DeleteClient(id);
+            await _authService.DeleteClientAccount(client_gd);
             return Ok();
-        }
-
-        [Authorize]
-        [HttpGet]
-        public async Task<ActionResult<Client>> GetByGd(Guid gd)
-        {
-            var user = await _authService.GetByGd(gd);
-            var model = _mapper.Map<ClientModel>(user);
-            return Ok(model);
         }
     }
 }

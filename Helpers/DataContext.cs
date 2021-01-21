@@ -1,4 +1,4 @@
-﻿using BarberAPI.Auth.Entities;
+﻿using BarberAPI.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -20,5 +20,7 @@ namespace BarberAPI.Helpers
         }
 
         public DbSet<Client> Clients { get; set; }
+        public DbSet<Barber> Barbers { get; set; }
+        public DbSet<Appointment> Appointments { get; set; }
     }
 }

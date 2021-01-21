@@ -1,18 +1,20 @@
-﻿using BarberAPI.Auth.Entities;
+﻿using BarberAPI.Entities;
 using BarberAPI.Helpers;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BarberAPI.Auth.Services
+namespace BarberAPI.Services
 {
     public interface IAuthService
     {
-        Client Authenticate(string username, string password);
+        Dictionary<string, Guid> Authenticate(string username, string password);
         Task<Client> RegisterClient(Client user, string password);
+        Task<Barber> RegisterBarber(Barber user, string password);
         Task<Client> GetByGd(Guid gd);
         Task UpdateClient(Client user, string password = null);
-        Task DeleteClient(int id);
+        Task DeleteClientAccount(Guid client_gd);
     }
 
     public class AuthService : IAuthService
@@ -24,23 +26,41 @@ namespace BarberAPI.Auth.Services
             _context = context;
         }
 
-        public Client Authenticate(string username, string password)
+        /*
+         * Checks if user is a barber or client
+         * Returns null on failed login
+         * Returns Dictionary with type of user & gd on succesfull login
+        */
+        public Dictionary<string, Guid> Authenticate(string username, string password)
         {
+            // Dictionary will hold type of user & gd of user
+            Dictionary<string, Guid> typeUser = new Dictionary<string, Guid>();
+
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
                 throw new AppException("Please enter your username & password.");
 
             var user = _context.Clients.SingleOrDefault(usr => usr.Username == username);
+            var barber = _context.Barbers.SingleOrDefault(barber => barber.Username == username);
 
             // Check if username exists
-            if (user == null)
+            if (user == null && barber == null)
                 return null;
-
-            // Check if password is correct
-            if (!VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
-                return null;
-
-            // Authentication successful
-            return user;
+            else if (user != null && barber == null)
+            {
+                // Check if password is correct
+                if (!VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
+                    return null;
+                typeUser.Add("Client", user.Gd);
+                return typeUser;
+            }
+            else if (user == null && barber != null)
+            {
+                if (!VerifyPasswordHash(password, barber.PasswordHash, barber.PasswordSalt))
+                    return null;
+                typeUser.Add("Barber", barber.Gd);
+                return typeUser;
+            }
+            return null;
         }
         
         public async Task<Client> RegisterClient(Client user, string password)
@@ -64,9 +84,30 @@ namespace BarberAPI.Auth.Services
             return user;
         }
 
-        public async Task DeleteClient(int id)
+        public async Task<Barber> RegisterBarber(Barber barber, string password)
         {
-            var user = await _context.Clients.FindAsync(id);
+            // Validation
+            if (string.IsNullOrWhiteSpace(password))
+                throw new AppException("Password is required");
+
+            if (_context.Barbers.Any(usr => usr.Username == barber.Username))
+                throw new AppException("Username \"" + barber.Username + "\" is already taken");
+
+            byte[] passwordHash, passwordSalt;
+            CreatePasswordHash(password, out passwordHash, out passwordSalt);
+
+            barber.PasswordHash = passwordHash;
+            barber.PasswordSalt = passwordSalt;
+
+            await _context.Barbers.AddAsync(barber);
+            await _context.SaveChangesAsync();
+
+            return barber;
+        }
+
+        public async Task DeleteClientAccount(Guid client_gd)
+        {
+            var user = await _context.Clients.FindAsync(client_gd);
             if (user != null)
             {
                 _context.Clients.Remove(user);
