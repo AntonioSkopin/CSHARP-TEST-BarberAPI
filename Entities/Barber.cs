@@ -1,9 +1,9 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace BarberAPI.Auth.Entities
+namespace BarberAPI.Entities
 {
-    public class Client
+    public class Barber
     {
         [Key]
         public Guid Gd { get; set; }
@@ -19,5 +19,11 @@ namespace BarberAPI.Auth.Entities
         public byte[] PasswordHash { get; set; }
 
         public byte[] PasswordSalt { get; set; }
+
+        public double HPrice { get; set; }
+
+        public double BPrice { get; set; }
+
+        public double HBPrice { get; set; }
     }
 }

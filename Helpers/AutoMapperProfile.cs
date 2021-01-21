@@ -1,6 +1,7 @@
-﻿using BarberAPI.Auth.Entities;
-using BarberAPI.Auth.Models;
-using AutoMapper;
+﻿using AutoMapper;
+using BarberAPI.DTO;
+using BarberAPI.Entities;
+using BarberAPI.Models;
 
 namespace BarberAPI.Helpers
 {
@@ -10,7 +11,9 @@ namespace BarberAPI.Helpers
         {
             CreateMap<Client, ClientModel>();
             CreateMap<RegisterClientModel, Client>();
-            CreateMap<UpdateClientModel, Client>();
+            CreateMap<UpdateModel, Client>();
+            CreateMap<RegisterBarberModel, Barber>();
+            CreateMap<BarberDTO, Barber>();
         }
     }
 }

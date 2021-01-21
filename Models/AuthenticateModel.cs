@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace BarberAPI.Auth.Models
+namespace BarberAPI.Models
 {
     public class AuthenticateModel
     {

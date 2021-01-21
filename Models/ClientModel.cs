@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BarberAPI.Auth.Models
+namespace BarberAPI.Models
 {
     public class ClientModel
     {

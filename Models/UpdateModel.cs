@@ -1,6 +1,6 @@
-﻿namespace BarberAPI.Auth.Models
+﻿namespace BarberAPI.Models
 {
-    public class UpdateClientModel
+    public class UpdateModel
     {
         public string Firstname { get; set; }
 
