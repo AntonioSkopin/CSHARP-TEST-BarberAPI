@@ -93,6 +93,7 @@ namespace BarberAPI
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IBarberService, BarberService>();
             services.AddScoped<IClientService, ClientService>();
+            services.AddScoped<IBarbershopOwnerService, BarbershopOwnerService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

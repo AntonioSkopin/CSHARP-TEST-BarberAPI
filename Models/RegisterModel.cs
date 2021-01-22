@@ -2,7 +2,7 @@
 
 namespace BarberAPI.Models
 {
-    public class RegisterClientModel
+    public class RegisterModel
     {
         [Required]
         public string Firstname { get; set; }

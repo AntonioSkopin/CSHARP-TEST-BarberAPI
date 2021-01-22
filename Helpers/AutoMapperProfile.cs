@@ -10,10 +10,11 @@ namespace BarberAPI.Helpers
         public AutoMapperProfile()
         {
             CreateMap<Client, ClientModel>();
-            CreateMap<RegisterClientModel, Client>();
+            CreateMap<RegisterModel, Client>();
             CreateMap<UpdateModel, Client>();
             CreateMap<RegisterBarberModel, Barber>();
             CreateMap<BarberDTO, Barber>();
+            CreateMap<RegisterModel, BarbershopOwner>();
         }
     }
 }

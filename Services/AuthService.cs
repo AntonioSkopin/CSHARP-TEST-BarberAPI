@@ -12,6 +12,7 @@ namespace BarberAPI.Services
         Dictionary<string, Guid> Authenticate(string username, string password);
         Task<Client> RegisterClient(Client user, string password);
         Task<Barber> RegisterBarber(Barber user, string password);
+        Task<BarbershopOwner> RegisterBarbershopOwner(BarbershopOwner user, string password);
         Task<Client> GetByGd(Guid gd);
         Task UpdateClient(Client user, string password = null);
         Task DeleteClientAccount(Guid client_gd);
@@ -41,11 +42,12 @@ namespace BarberAPI.Services
 
             var user = _context.Clients.SingleOrDefault(usr => usr.Username == username);
             var barber = _context.Barbers.SingleOrDefault(barber => barber.Username == username);
+            var barbershopOwner = _context.BarbershopOwners.SingleOrDefault(owner => owner.Username == username);
 
             // Check if username exists
-            if (user == null && barber == null)
+            if (user == null && barber == null && barbershopOwner == null)
                 return null;
-            else if (user != null && barber == null)
+            else if (user != null && barber == null && barbershopOwner == null)
             {
                 // Check if password is correct
                 if (!VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
@@ -53,11 +55,18 @@ namespace BarberAPI.Services
                 typeUser.Add("Client", user.Gd);
                 return typeUser;
             }
-            else if (user == null && barber != null)
+            else if (user == null && barber != null && barbershopOwner == null)
             {
                 if (!VerifyPasswordHash(password, barber.PasswordHash, barber.PasswordSalt))
                     return null;
                 typeUser.Add("Barber", barber.Gd);
+                return typeUser;
+            }
+            else if (user == null && barber == null && barbershopOwner != null)
+            {
+                if (!VerifyPasswordHash(password, barbershopOwner.PasswordHash, barbershopOwner.PasswordSalt))
+                    return null;
+                typeUser.Add("Owner", barbershopOwner.Gd);
                 return typeUser;
             }
             return null;
@@ -103,6 +112,27 @@ namespace BarberAPI.Services
             await _context.SaveChangesAsync();
 
             return barber;
+        }
+
+        public async Task<BarbershopOwner> RegisterBarbershopOwner(BarbershopOwner barbershopOwner, string password)
+        {
+            // Validation
+            if (string.IsNullOrWhiteSpace(password))
+                throw new AppException("Password is required");
+
+            if (_context.Barbers.Any(usr => usr.Username == barbershopOwner.Username))
+                throw new AppException("Username \"" + barbershopOwner.Username + "\" is already taken");
+
+            byte[] passwordHash, passwordSalt;
+            CreatePasswordHash(password, out passwordHash, out passwordSalt);
+
+            barbershopOwner.PasswordHash = passwordHash;
+            barbershopOwner.PasswordSalt = passwordSalt;
+
+            await _context.BarbershopOwners.AddAsync(barbershopOwner);
+            await _context.SaveChangesAsync();
+
+            return barbershopOwner;
         }
 
         public async Task DeleteClientAccount(Guid client_gd)

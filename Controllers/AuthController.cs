@@ -87,7 +87,7 @@ namespace BarberAPI.Controllers
 
         [AllowAnonymous]
         [HttpPost]
-        public async Task<ActionResult<Client>> RegisterClient([FromBody] RegisterClientModel model)
+        public async Task<ActionResult<Client>> RegisterClient([FromBody] RegisterModel model)
         {
             // Map model to entity
             var user = _mapper.Map<Client>(model);
@@ -116,6 +116,26 @@ namespace BarberAPI.Controllers
             {
                 // Create user
                 await _authService.RegisterBarber(user, model.Password);
+                return Ok();
+            }
+            catch (AppException ex)
+            {
+                // Return error message if there was an exception
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        public async Task<ActionResult<BarbershopOwner>> RegisterBarbershopOwner([FromBody] RegisterModel model)
+        {
+            // Map model to entity
+            var user = _mapper.Map<BarbershopOwner>(model);
+
+            try
+            {
+                // Create user
+                await _authService.RegisterBarbershopOwner(user, model.Password);
                 return Ok();
             }
             catch (AppException ex)

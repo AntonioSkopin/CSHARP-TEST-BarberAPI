@@ -73,13 +73,14 @@ namespace BarberAPI.Services
 
         public async Task<double> GetDayIncome(Guid barber_gd)
         {
-            var getTodayIncomeQuery =
+            var getDayIncomeQuery =
             @"
                 SELECT SUM(Price) FROM Appointments
                 WHERE BarberGd = @_barber_gd
+                AND CAST(apnmt.Date AS Date) = CASTE(GETDATE() AS Date)
             ";
 
-            return await GetQuery<double>(getTodayIncomeQuery, new
+            return await GetQuery<double>(getDayIncomeQuery, new
             {
                 _barber_gd = barber_gd
             });
@@ -91,6 +92,7 @@ namespace BarberAPI.Services
             @"
                 SELECT SUM(Price) FROM Appointments
                 WHERE BarberGd = @_barber_gd
+                AND Month(Date) = Month(GETDATE())
             ";
 
             return await GetQuery<double>(getMonthIncomeQuery, new
@@ -105,6 +107,7 @@ namespace BarberAPI.Services
             @"
                 SELECT SUM(Price) FROM Appointments
                 WHERE BarberGd = @_barber_gd
+                AND YEAR(Date) = YEAR(GETDATE())
             ";
 
             return await GetQuery<double>(getYearIncomeQuery, new
