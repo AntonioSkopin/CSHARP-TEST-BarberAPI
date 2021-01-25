@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BarberAPI.Entities
 {
@@ -14,6 +11,10 @@ namespace BarberAPI.Entities
         public string Shopname { get; set; }
 
         public Guid OwnerGd { get; set; }
+
+        public string Phone { get; set; }
+
+        public string Location { get; set; }
 
         public DateTime DateOpened { get; set; }
     }

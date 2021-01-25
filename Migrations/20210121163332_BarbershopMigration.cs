@@ -32,6 +32,7 @@ namespace BarberAPI.Migrations
                     Lastname = table.Column<string>(nullable: true),
                     Username = table.Column<string>(nullable: true),
                     Email = table.Column<string>(nullable: true),
+                    Phone = table.Column<string>(nullable: true),
                     PasswordHash = table.Column<byte[]>(nullable: true),
                     PasswordSalt = table.Column<byte[]>(nullable: true),
                     HPrice = table.Column<double>(nullable: false),
@@ -54,7 +55,6 @@ namespace BarberAPI.Migrations
                     Email = table.Column<string>(nullable: true),
                     PasswordHash = table.Column<byte[]>(nullable: true),
                     PasswordSalt = table.Column<byte[]>(nullable: true),
-                    AmountOfShops = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -68,6 +68,8 @@ namespace BarberAPI.Migrations
                     Gd = table.Column<Guid>(nullable: false),
                     Shopname = table.Column<string>(nullable: true),
                     OwnerGd = table.Column<Guid>(nullable: false),
+                    Phone = table.Column<string>(nullable: true),
+                    Location = table.Column<string>(nullable: true),
                     DateOpened = table.Column<DateTime>(nullable: false)
                 },
                 constraints: table =>
