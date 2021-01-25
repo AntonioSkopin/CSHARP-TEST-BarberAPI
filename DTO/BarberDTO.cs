@@ -14,6 +14,8 @@ namespace BarberAPI.DTO
 
         public string Email { get; set; }
 
+        public string Phone { get; set; }
+
         public double HPrice { get; set; }
 
         public double BPrice { get; set; }

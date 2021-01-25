@@ -39,6 +39,12 @@ namespace BarberAPI.Controllers
             return Ok(await _clientService.GetBarberInfoOfAppointment(appointment_gd));
         }
 
+        [HttpGet]
+        public async Task<ActionResult<AppointmentDTO>> GetUpcommingAppointment(Guid user_gd)
+        {
+            return Ok(await _clientService.GetUpcommingAppointment(user_gd));
+        }
+
         [HttpPost]
         public async Task<ActionResult> PlanAppointment([FromBody] Appointment appointment)
         {

@@ -78,8 +78,17 @@ namespace BarberAPI.Services
             if (string.IsNullOrWhiteSpace(password))
                 throw new AppException("Password is required");
 
+            // Check if username is taken
             if (_context.Clients.Any(usr => usr.Username == user.Username))
-                throw new AppException("Username \"" + user.Username + "\" is already taken");
+                throw new AppException("Username: \"" + user.Username + "\" is already taken");
+
+            // Check if email is taken
+            if (_context.Clients.Any(usr => usr.Email == user.Email))
+                throw new AppException("Email: \"" + user.Email + "\" is already taken");
+
+            // Check if phone number is taken
+            if (_context.Clients.Any(usr => usr.Phone == user.Phone))
+                throw new AppException("Phone number: \"" + user.Phone + "\" is already taken");
 
             byte[] passwordHash, passwordSalt;
             CreatePasswordHash(password, out passwordHash, out passwordSalt);
@@ -173,6 +182,15 @@ namespace BarberAPI.Services
 
             if (!string.IsNullOrWhiteSpace(userParam.Lastname))
                 user.Lastname = userParam.Lastname;
+
+            if (!string.IsNullOrWhiteSpace(userParam.Username))
+                user.Username = userParam.Username;
+
+            if (!string.IsNullOrWhiteSpace(userParam.Email))
+                user.Email = userParam.Email;
+
+            if (!string.IsNullOrWhiteSpace(userParam.Phone))
+                user.Phone = userParam.Phone;
 
             // Update password if provided
             if (!string.IsNullOrWhiteSpace(password))
